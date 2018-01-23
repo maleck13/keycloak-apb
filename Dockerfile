@@ -22,5 +22,6 @@ c2VydmljZSB0aGUgY2xpZW50IGlzIGZvcgogICAgICB0eXBlOiBzdHJpbmcK"
 COPY playbooks /opt/apb/actions
 COPY roles /opt/ansible/roles
 COPY vars /opt/ansible/vars
+COPY asb_last_operation.py /etc/ansible/roles/ansibleplaybookbundle.asb-modules/library/
 RUN chmod -R g=u /opt/{ansible,apb}
 USER apb

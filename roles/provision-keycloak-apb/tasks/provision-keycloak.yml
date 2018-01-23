@@ -8,6 +8,10 @@
       storage: 10M
   register: create_volume_claim
 
+- name: update_last_op
+  asb_last_operation:
+    description: "created pvc"  
+
 - name: create deployment config
   openshift_v1_deployment_config:
     name: keycloak
@@ -61,6 +65,11 @@
         name: keycloak-metrics
         sub_path: providers/
 
+- name: update_last_op
+  asb_last_operation:
+    description: "created keycloak deploymentconfig"  
+
+
 - name: create keycloak service
   k8s_v1_service:
     name: keycloak
@@ -79,6 +88,11 @@
     - name: web
       port: 80
       target_port: 8080
+
+
+- name: update_last_op
+  asb_last_operation:
+    description: "created keycloak route"  
 
 - name: create keycloak http route
   openshift_v1_route:
@@ -105,6 +119,10 @@
     to_name: keycloak
     spec_port_target_port: web
   when: keycloak_protocol == 'https'
+
+- name: update_last_op
+  asb_last_operation:
+    description: "created keycloak route"    
 
 - name: "Retrieve route to keycloak"
   shell: "oc get routes keycloak -n '{{ namespace }}' | grep -v NAME | awk '{print $2}'"
@@ -151,6 +169,10 @@
       Authorization: "bearer {{ keycloak_auth_response.json.access_token }}"
     status_code: 201
 
+- name: update_last_op
+  asb_last_operation:
+    description: "created new realm in keycloak"    
+
 -
   name: Generate Username
   shell: tr -d -c "a-zA-Z" < /dev/urandom | head -c 20
@@ -172,6 +194,10 @@
     headers:
       Authorization: "bearer {{ keycloak_auth_response.json.access_token }}"
     status_code: 201
+
+- name: update_last_op
+  asb_last_operation:
+    description: "created public client in keycloak realm"    
 
 -
   name: "Create {{ generated_username.stdout }}-bearer client in realm {{ namespace }}"
@@ -230,6 +256,10 @@
 
 - name: Create keycloak public client secret
   shell: oc create -f /tmp/secret.yaml -n {{ namespace }}
+
+- name: update_last_op
+  asb_last_operation:
+    description: "created client config"    
 
 - name: delete secret template file
   file: path=/tmp/secret.yaml state=absent

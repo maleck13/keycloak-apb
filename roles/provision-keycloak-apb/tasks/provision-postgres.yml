@@ -14,6 +14,10 @@
       database-password: '{{ gen_password.stdout }}'
       database-name: "{{ postgres_database_name }}"
 
+- name: update_last_op
+  asb_last_operation:
+    description: "created postgres secret"  
+
 - k8s_v1_service:
     name: '{{ postgres_service_name }}'
     namespace: '{{ namespace }}'
@@ -29,6 +33,10 @@
       name: '{{ postgres_service_name }}'
     spec_type: ClusterIP
     session_affinity: None
+
+- name: update_last_op
+  asb_last_operation:
+    description: "created postgres service"      
 
 - k8s_v1_persistent_volume_claim:
     name: '{{ postgres_service_name }}'
